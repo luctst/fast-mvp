@@ -1,0 +1,56 @@
+version: "3.8"
+services:
+  api:
+    container_name: api
+    build:
+      context: ./api/
+      dockerfile: dockerfile
+    ports:
+      - "5000:3002"
+      - "9229:9229"
+    env_file:
+      - .env
+    volumes:
+      - ./api/:/app
+      - /app/node_modules
+    command: npm start
+    depends_on:
+      - db
+      - redis
+  app:
+    container_name: app
+    build:
+      context: ./client/
+      dockerfile: dockerfile
+    volumes:
+      - './client/:/app'
+      - '/app/node_modules'
+    ports:
+      - 8080:8080
+    command: npm run serve
+    depends_on:
+      - api
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+  db:
+    container_name: "db"
+    image: mongo
+    ports:
+      - "27017:27017"
+    expose:
+      - 27017
+    volumes:
+      - mongo-data:/data/db
+  redis:
+    container_name: "redis"
+    image: "redis"
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    expose:
+      - 6379
+
+volumes:
+  mongo-data:
