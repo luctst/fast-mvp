@@ -9,7 +9,7 @@ const compression = require("compression");
 const helmet = require('helmet');
 
 express.use(e.json());
-express.use(cors();
+express.use(cors());
 express.use(helmet());
 express.use(cookieParser());
 express.use(compression());
